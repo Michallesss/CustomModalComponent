@@ -1,38 +1,62 @@
-import { useState } from 'react';
+import { Component } from 'react';
 import './modal.css';
 
-function Modal({isOpen: initIsOpen = false, children}){
-  const [isOpen, setIsOpen] = useState(initIsOpen);
-
-  const toggle = () => setIsOpen(!open);
-
-  if (isOpen) return (
-    <div className="modal-background" onClick={toggle}>
-      <div onClick={(e) => e.stopPropagation()}>
-        {children}
-      </div>
-    </div>
-  );
+interface ModalProps {
+  children: React.ReactNode;
 }
 
+interface ModalState {
+  isOpen: boolean;
+}
 
-Modal.Header = ({ title, toggle }) => (
-  <div className="modal-header">
-    <h2>{title}</h2>
-    <button onClick={toggle}>X</button>
-  </div>
-);
+export default class Modal extends Component<ModalProps> {
+  state: ModalState = {
+    isOpen: true,
+  }
+  
+  constructor(props: ModalProps) {
+    super(props);
+  }
 
-Modal.Content = ({ children }) => (
-  <div className="modal-body">
-    {children}
-  </div>
-);
+  disable = () => {
+    this.setState({ isOpen: false });
+  }
 
-Modal.Footer = ({ callToActionLabel }) => (
-  <div className="modal-footer">
-    <button>{callToActionLabel}</button>
-  </div>
-);
+  static Header({ title }: { title: string; }) {
+    return (
+      <div className="modal-header">
+        <h2>{title}</h2>
+        {/* <button onClick={this.disable}>X</button> */}
+      </div>
+    );
+  }
 
-export default Modal;
+  static Content({ children }: { children: React.ReactNode; }) {
+    return (
+      <div className="modal-body">
+        {children}
+      </div>
+    );
+  }
+
+  static Footer({ callToActionLabel }: { callToActionLabel: string; }) {
+    return (
+      <div className="modal-footer">
+        <button onClick={() => alert(callToActionLabel)}>click me</button>
+      </div>
+    );
+  }
+
+  render() {
+    return (
+      <div className="modal-background">
+        {this.state.isOpen && (
+          <div>
+            <button onClick={this.disable}>X</button>
+            {this.props.children}
+          </div>
+        )}
+      </div>
+    );
+  }
+}
